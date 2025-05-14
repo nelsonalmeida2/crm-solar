@@ -76,13 +76,14 @@ WSGI_APPLICATION = 'crm.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'cr_solar_db',
+        'NAME': 'crm_solar_db',
         'USER': 'nels0n23',
-        'PASSWORD': 'Claraa2016',
-        'HOST': 'localhost',
+        'PASSWORD': 'senha123',
+        'HOST': 'db',  # <- Nome do serviço no docker-compose.yml
         'PORT': '5432',
     }
 }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators

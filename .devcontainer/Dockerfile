@@ -1,9 +1,9 @@
 FROM python:3.11-slim
 
-# Set working directory
+# Define o diretório de trabalho (dentro do container)
 WORKDIR /app
 
-# Install system dependencies
+# Instala dependências do sistema (PostgreSQL e ferramentas úteis)
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpq-dev \
@@ -11,8 +11,11 @@ RUN apt-get update && apt-get install -y \
     git \
     && apt-get clean
 
-# Upgrade pip
+# Atualiza o pip
 RUN pip install --upgrade pip
 
-# Copy project files
+# Copia os ficheiros do projeto para o container
 COPY . .
+
+# (Opcional) Instala dependências Python automaticamente se existir requirements.txt
+RUN if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
