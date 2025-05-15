@@ -1,0 +1,15 @@
+{% extends 'crmsolar/base.html' %}
+
+{% block content %}
+
+{% if artigos %}
+<ul>
+    {% for company in companies %}
+    <li>{{ company.name }}</li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>Não existem empresas ainda.</p>
+{% endif %}
+
+{% endblock%}
