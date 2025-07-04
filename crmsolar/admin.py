@@ -15,7 +15,8 @@ from .models import (
     CalendarEntry,
     Priority,
     TaskType,
-    Task
+    Task,
+    Observation,
 )
 
 # Modelos SEM histórico
@@ -29,6 +30,7 @@ admin.site.register(Product)
 admin.site.register(CalendarEntry)
 admin.site.register(Priority)
 admin.site.register(TaskType)
+admin.site.register(Observation)
 
 # Modelos COM histórico
 admin.site.register(Address, SimpleHistoryAdmin)
