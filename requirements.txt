@@ -1,2 +1,13 @@
-Django>=4.2
-psycopg2>=2.9
+django
+Pillow
+python-decouple
+django_extensions
+django-allauth
+requests
+PyJWT
+cryptography
+selenium
+django-ninja
+requests
+django-simple-history
+psycopg2-binary
