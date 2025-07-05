@@ -3,7 +3,38 @@ from django.conf import settings
 from simple_history.models import HistoricalRecords
 
 
-# TODO CRIAR CLASSE ABSTRATA PARA COM CAMPOS DE AUDITORIA E HISTORICO SIMPLE HISTORY E EXTENDER A CLASS QUE PRECISE DE AUDITORIA
+class TimeStampedUserModel(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="%(class)s_created"
+    )
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="%(class)s_updated"
+    )
+
+    assigned_to = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="%(class)s_assigned"
+    )
+
+    history = HistoricalRecords(inherit=True)
+
+    class Meta:
+        abstract = True
+
 
 class District(models.Model):
     id = models.AutoField(primary_key=True)
@@ -22,7 +53,7 @@ class Country(models.Model):
         return self.name
 
 
-class Address(models.Model):
+class Address(TimeStampedUserModel):
     id = models.AutoField(primary_key=True)
     street_address = models.CharField(max_length=240, null=True, blank=True)
     city = models.CharField(max_length=50, null=True, blank=True)
@@ -43,7 +74,7 @@ class Segment(models.Model):
         return self.name
 
 
-class BuildingType(models.Model):  # antigo Type_of_Building
+class BuildingType(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100, unique=True)
 
@@ -52,25 +83,51 @@ class BuildingType(models.Model):  # antigo Type_of_Building
 
 
 class Observation(models.Model):
+    id = models.AutoField(primary_key=True)
     text = models.TextField()
-
     cpe = models.ForeignKey('CPE', on_delete=models.CASCADE, null=True, blank=True, related_name='observations')
     task = models.ForeignKey('Task', on_delete=models.CASCADE, null=True, blank=True, related_name='observations')
     company = models.ForeignKey('Company', on_delete=models.CASCADE, null=True, blank=True, related_name='observations')
     opportunity = models.ForeignKey('Opportunity', on_delete=models.CASCADE, null=True, blank=True,
                                     related_name='observations')
     contact = models.ForeignKey('Contact', on_delete=models.CASCADE, null=True, blank=True, related_name='observations')
+    group = models.ForeignKey('CompanyGroup', on_delete=models.CASCADE, null=True, blank=True,
+                              related_name='observations')
 
     def __str__(self):
         return self.text[:50]
 
 
-class Contact(models.Model):
-    company = models.ForeignKey(
-        Company,
-        on_delete=models.CASCADE,
-        related_name='contacts'
+class Company(TimeStampedUserModel):
+    nif = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=100)
+    address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True)
+    segment = models.ForeignKey(Segment, on_delete=models.SET_NULL, null=True, blank=True)
+    phone_number = models.CharField(max_length=20, null=True, blank=True)
+    email = models.EmailField(max_length=100, null=True, blank=True)
+    website = models.URLField(null=True, blank=True)
+    has_solar_panels = models.BooleanField(default=False)
+    type_of_building = models.ForeignKey(BuildingType, on_delete=models.SET_NULL, null=True, blank=True)
+    group = models.ForeignKey(
+        'CompanyGroup',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='companies'
     )
+    contacts = models.ManyToManyField(
+        'Contact',
+        blank=True,
+        related_name='companies'
+    )
+    is_hidden = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.name
+
+
+class Contact(TimeStampedUserModel):
+    id = models.AutoField(primary_key=True)
     role = models.CharField(max_length=100)
     department = models.CharField(max_length=100, null=True, blank=True)
     name = models.CharField(max_length=100)
@@ -97,18 +154,21 @@ class Contact(models.Model):
         return self.name
 
 
-class Company(models.Model):
-    nif = models.IntegerField(primary_key=True)
-    name = models.CharField(max_length=100)
-    address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True)
-    segment = models.ForeignKey(Segment, on_delete=models.SET_NULL, null=True, blank=True)
-    phone_number = models.CharField(max_length=20, null=True, blank=True)
-    email = models.EmailField(max_length=100, null=True, blank=True)
-    website = models.URLField(null=True, blank=True)
-    has_solar_panels = models.BooleanField(default=False)
-    type_of_building = models.ForeignKey(BuildingType, on_delete=models.SET_NULL, null=True, blank=True)
-
-    is_hidden = models.BooleanField(default=False)
+class CompanyGroup(TimeStampedUserModel):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=255)
+    segment = models.ForeignKey(
+        'Segment',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='groups'
+    )
+    contacts = models.ManyToManyField(
+        'Contact',
+        blank=True,
+        related_name='groups'
+    )
 
     def __str__(self):
         return self.name
@@ -122,7 +182,7 @@ class Provider(models.Model):
         return self.name
 
 
-class CPE(models.Model):
+class CPE(TimeStampedUserModel):
     id = models.AutoField(primary_key=True)
     code = models.CharField(max_length=100, unique=True)
     company = models.ForeignKey(Company, on_delete=models.SET_NULL, null=True, blank=True)
@@ -134,7 +194,6 @@ class CPE(models.Model):
     has_solar_panels = models.BooleanField(default=False)
     type_of_building = models.ForeignKey(BuildingType, on_delete=models.SET_NULL, null=True, blank=True)
     fidelization_end_date = models.DateField(null=True, blank=True)
-
     is_active = models.BooleanField(default=False)
 
     def __str__(self):
@@ -158,13 +217,26 @@ class Product(models.Model):
         return self.name
 
 
-class Opportunity(models.Model):
+class Opportunity(TimeStampedUserModel):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
     cpe = models.ForeignKey(CPE, on_delete=models.SET_NULL, null=True, blank=True)
     company = models.ForeignKey(Company, on_delete=models.SET_NULL, null=True, blank=True)
     opportunity_status = models.ForeignKey(OpportunityStatus, on_delete=models.SET_NULL, null=True)
-    opportunity_value = models.FloatField(null=True, blank=True)
+    opportunity_value = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text="Estimated value of the opportunity"
+    )
+    revenue = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text="Actual revenue if the opportunity is closed"
+    )
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
     description = models.TextField(null=True, blank=True)
     closed_at = models.DateTimeField(null=True, blank=True)
@@ -193,34 +265,31 @@ class CalendarEntry(models.Model):
         return self.date.strftime("%d/%m/%Y")
 
 
-class Priority(models.Model):
-    name = models.CharField(max_length=50, unique=True)
-    level = models.PositiveIntegerField(help_text="Nível de prioridade, por exemplo 1 para alta, 2 para média, etc.")
-
-    def __str__(self):
-        return self.name
-
-
 class TaskType(models.Model):
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50, unique=True)
 
     def __str__(self):
         return self.name
 
 
-# TODO REVER LOGICA DO TASK
-class Task(models.Model):
+class Task(TimeStampedUserModel):
+    PRIORITY_CHOICES = [
+        ('high', 'High'),
+        ('medium', 'Medium'),
+        ('low', 'Low'),
+    ]
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=200)
     description = models.TextField(null=True, blank=True)
-
     start_datetime = models.DateTimeField()
     due_datetime = models.DateTimeField()
-    reminder_datetime = models.DateTimeField(null=True, blank=True)
-
-    priority = models.ForeignKey(Priority, on_delete=models.SET_NULL, null=True)
+    priority = models.CharField(
+        max_length=10,
+        choices=PRIORITY_CHOICES,
+        default='medium'
+    )
     task_type = models.ForeignKey(TaskType, on_delete=models.SET_NULL, null=True)
-
     completed = models.BooleanField(default=False)
 
     def __str__(self):
