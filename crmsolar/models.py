@@ -3,6 +3,8 @@ from django.conf import settings
 from simple_history.models import HistoricalRecords
 
 
+# TODO CRIAR CLASSE ABSTRATA PARA COM CAMPOS DE AUDITORIA E HISTORICO SIMPLE HISTORY E EXTENDER A CLASS QUE PRECISE DE AUDITORIA
+
 class District(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100, unique=True)
@@ -28,8 +30,6 @@ class Address(models.Model):
     district = models.ForeignKey(District, on_delete=models.SET_NULL, null=True, blank=True)
     country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True, blank=True)
     county = models.CharField(max_length=50, null=True, blank=True)
-
-    history = HistoricalRecords()
 
     def __str__(self):
         return self.street_address or "Address"
@@ -59,16 +59,47 @@ class Observation(models.Model):
     company = models.ForeignKey('Company', on_delete=models.CASCADE, null=True, blank=True, related_name='observations')
     opportunity = models.ForeignKey('Opportunity', on_delete=models.CASCADE, null=True, blank=True,
                                     related_name='observations')
+    contact = models.ForeignKey('Contact', on_delete=models.CASCADE, null=True, blank=True, related_name='observations')
 
     def __str__(self):
         return self.text[:50]
 
 
+class Contact(models.Model):
+    company = models.ForeignKey(
+        Company,
+        on_delete=models.CASCADE,
+        related_name='contacts'
+    )
+    role = models.CharField(max_length=100)
+    department = models.CharField(max_length=100, null=True, blank=True)
+    name = models.CharField(max_length=100)
+    phone = models.CharField(max_length=20, null=True, blank=True)
+    mobile = models.CharField(max_length=20, null=True, blank=True)
+    email = models.EmailField(max_length=100, null=True, blank=True)
+    linkedin = models.URLField(null=True, blank=True)
+    is_primary = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+
+    PREFERRED_METHOD_CHOICES = [
+        ('email', 'Email'),
+        ('phone', 'Phone'),
+        ('mobile', 'Mobile'),
+    ]
+    preferred_contact_method = models.CharField(
+        max_length=10,
+        choices=PREFERRED_METHOD_CHOICES,
+        null=True,
+        blank=True
+    )
+
+    def __str__(self):
+        return self.name
+
+
 class Company(models.Model):
     nif = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=100)
-    assigned_to = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
-                                    related_name='companies_assigned')
     address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True)
     segment = models.ForeignKey(Segment, on_delete=models.SET_NULL, null=True, blank=True)
     phone_number = models.CharField(max_length=20, null=True, blank=True)
@@ -78,8 +109,6 @@ class Company(models.Model):
     type_of_building = models.ForeignKey(BuildingType, on_delete=models.SET_NULL, null=True, blank=True)
 
     is_hidden = models.BooleanField(default=False)
-
-    history = HistoricalRecords()
 
     def __str__(self):
         return self.name
@@ -97,8 +126,6 @@ class CPE(models.Model):
     id = models.AutoField(primary_key=True)
     code = models.CharField(max_length=100, unique=True)
     company = models.ForeignKey(Company, on_delete=models.SET_NULL, null=True, blank=True)
-    assigned_to = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
-                                    related_name='cpes_assigned')
     address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True)
     tension = models.CharField(max_length=50, null=True, blank=True)
     contracted_power = models.FloatField(null=True, blank=True)
@@ -109,8 +136,6 @@ class CPE(models.Model):
     fidelization_end_date = models.DateField(null=True, blank=True)
 
     is_active = models.BooleanField(default=False)
-
-    history = HistoricalRecords()
 
     def __str__(self):
         return self.code
@@ -136,8 +161,6 @@ class Product(models.Model):
 class Opportunity(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
-    assigned_to = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
-                                    related_name='opportunities_assigned')
     cpe = models.ForeignKey(CPE, on_delete=models.SET_NULL, null=True, blank=True)
     company = models.ForeignKey(Company, on_delete=models.SET_NULL, null=True, blank=True)
     opportunity_status = models.ForeignKey(OpportunityStatus, on_delete=models.SET_NULL, null=True)
@@ -146,8 +169,6 @@ class Opportunity(models.Model):
     description = models.TextField(null=True, blank=True)
     closed_at = models.DateTimeField(null=True, blank=True)
     exclusivity_expires_at = models.DateTimeField()
-
-    history = HistoricalRecords()
 
     def __str__(self):
         return self.name
@@ -187,6 +208,7 @@ class TaskType(models.Model):
         return self.name
 
 
+# TODO REVER LOGICA DO TASK
 class Task(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=200)
@@ -200,9 +222,6 @@ class Task(models.Model):
     task_type = models.ForeignKey(TaskType, on_delete=models.SET_NULL, null=True)
 
     completed = models.BooleanField(default=False)
-    assigned_to = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
-
-    history = HistoricalRecords()
 
     def __str__(self):
         return self.title
