@@ -1,0 +1,61 @@
+# ======================================================================
+# 1. PYTHON / VENV
+# ======================================================================
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Byte-compiled / cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Generated distribution files
+*.egg
+*.egg-info
+dist/
+build/
+develop-eggs/
+
+# ======================================================================
+# 2. DJANGO
+# ======================================================================
+
+# Development database (SQLite)
+# Crucial to avoid committing sensitive or local data.
+db.sqlite3
+
+# Log files
+*.log
+
+# User Uploaded Files (Media/Uploads)
+# Never commit user-uploaded files to Git
+/media/
+
+# Collected Static Files
+# Django generates these files; they should not be in the repository.
+/static/
+
+# Local Configuration File (Protecting SECRET_KEY)
+# If you move your SECRET_KEY and other environment variables to a .env file
+.env
+*.env
+local_settings.py
+
+# ======================================================================
+# 3. PYCHARM / IDE
+# ======================================================================
+# PyCharm specific configurations (user/workspace data)
+.idea/
+# Ignore search history
+.history/
+
+# ======================================================================
+# 4. OPERATING SYSTEM
+# ======================================================================
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db

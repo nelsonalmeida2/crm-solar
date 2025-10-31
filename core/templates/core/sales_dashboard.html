@@ -1,0 +1,124 @@
+{% extends "core/base.html" %}
+
+{% block title %}Dashboard de Vendas{% endblock %}
+
+{% block content %}
+
+    <h1>Dashboard de Vendas</h1>
+
+    <style>
+        .kpi-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .kpi-card {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-left: 5px solid #007bff;
+        }
+        .kpi-card h3 { margin-top: 0; font-size: 1em; color: #555; }
+        .kpi-value { font-size: 2em; font-weight: bold; color: #007bff; }
+        .list-section { margin-top: 40px; background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .list-section h2 { border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 0; font-size: 1.5em; }
+        .list-section table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .list-section th, .list-section td { border: 1px solid #ddd; padding: 10px; text-align: left; font-size: 0.9em; }
+        .list-section th { background-color: #f9f9f9; font-weight: 600; }
+        .empty-message { color: gray; padding: 10px; }
+    </style>
+
+    <div class="kpi-section">
+        <div class="kpi-card" style="border-left-color: #28a745;">
+            <h3>Valor em Pipeline</h3>
+            <div class="kpi-value">{{ total_pipeline_value|floatformat:2|default:"0.00" }} €</div>
+        </div>
+        <div class="kpi-card" style="border-left-color: #ffc107;">
+            <h3>Oportunidades Abertas</h3>
+            <div class="kpi-value">{{ assigned_opportunities.count }}</div>
+        </div>
+        <div class="kpi-card" style="border-left-color: #17a2b8;">
+            <h3>Clientes Atribuídos</h3>
+            <div class="kpi-value">{{ assigned_companies.count }}</div>
+        </div>
+        <div class="kpi-card" style="border-left-color: #dc3545;">
+            <h3>Pontos de Energia</h3>
+            <div class="kpi-value">{{ assigned_cpes.count }}</div>
+        </div>
+    </div>
+
+    <div class="list-section">
+        <h2>Minhas Oportunidades ({{ assigned_opportunities.count }})</h2>
+        {% if assigned_opportunities %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Oportunidade</th>
+                        <th>Cliente</th>
+                        <th>CPE</th>
+                        <th>Status</th>
+                        <th>Valor (€)</th>
+                        <th>Próxima Tarefa</th>
+                        <th>Última Atualização</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for opp in assigned_opportunities %}
+                    <tr>
+                        <td>{{ opp.name }}</td>
+                        <td>{{ opp.company.name|default:"N/A" }}</td>
+                        <td>{{ opp.cpe.code|default:"N/A" }}</td>
+                        <td>{{ opp.opportunity_status.name|default:"Desconhecido" }}</td>
+                        <td>{{ opp.opportunity_value|floatformat:2|default:"-" }}</td>
+                        <td>
+                            {% with next_task=opp.tasks.first %}
+                                {% if next_task %}
+                                    {{ next_task.title }} ({{ next_task.due_datetime|date:"d/m" }})
+                                {% else %}
+                                    Nenhuma
+                                {% endif %}
+                            {% endwith %}
+                        </td>
+                        <td>{{ opp.updated_at|date:"d/m/Y H:i" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="empty-message">Não tem oportunidades ativas atribuídas a si.</p>
+        {% endif %}
+    </div>
+
+    <div class="list-section">
+        <h2>Meus Clientes ({{ assigned_companies.count }})</h2>
+        {% if assigned_companies %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>NIF</th>
+                        <th>Telefone</th>
+                        <th>Possui Solar?</th>
+                        <th>Última Atualização</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for company in assigned_companies %}
+                    <tr>
+                        <td>{{ company.name }}</td>
+                        <td>{{ company.nif }}</td>
+                        <td>{{ company.phone_number|default:"-" }}</td>
+                        <td>{{ company.has_solar_panels|yesno:"Sim,Não" }}</td>
+                        <td>{{ company.updated_at|date:"d/m/Y" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="empty-message">Não tem clientes (empresas) atribuídos diretamente a si.</p>
+        {% endif %}
+    </div>
+
+    {% endblock content %}
