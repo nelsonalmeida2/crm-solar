@@ -132,5 +132,5 @@ Follow the standard Git workflow:
 ---
 
 👨‍💻 **Developed by:** Nelson Almeida  
-📅 **Version:** 1.0  
+📅 **Version:** 0.1.0  
 📦 **License:** MIT
