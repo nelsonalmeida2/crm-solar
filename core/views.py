@@ -20,13 +20,9 @@ def login_view(request):
 
         if user is not None:
             login(request, user)
-
-            # --- CORREÇÃO: Forçar o salvamento da sessão ---
             if request.session.session_key is None:
                 request.session.create()
             request.session.save()
-            # ---------------------------------------------
-
             return redirect('sales_dashboard')
         else:
             messages.error(request, 'Invalid username or password.')
@@ -90,4 +86,4 @@ def sales_dashboard_view(request):
     }
 
     # Template a ser criado em core/templates/core/sales_dashboard.html
-    return render(request, 'core/sales_dashboard.html', context)
+    return render(request, 'sales/sales_dashboard.html', context)
