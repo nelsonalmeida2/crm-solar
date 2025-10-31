@@ -48,12 +48,6 @@ pip install -r requirements.txt
 
 Initialize the base Django project structure and prepare the database.
 
-#### Create Project Files (if missing)
-
-```bash
-django-admin startproject crm_solar_root .
-```
-
 #### Generate Migration Files
 
 ```bash
