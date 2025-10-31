@@ -22,7 +22,7 @@ Follow these steps to set up and run the project locally:
 ### 1️⃣ Clone the Repository
 
 ```bash
-git clone [YOUR_REPOSITORY_URL]
+git clone https://github.com/nelsonalmeida2/crm-solar.git
 cd crm-solar
 ```
 
@@ -83,7 +83,7 @@ The system will be accessible at:
 
 The project is divided into independent Django applications, each with specific responsibilities:
 
-| Application | Responsibility | Key Models |
+| Application | Responsibility | Key Entities |
 |--------------|----------------|-------------|
 | **core** | Central logic, authentication, dashboard, and abstract models (e.g., `TimeStampedUserModel`) | `login_view`, `sales_dashboard_view` |
 | **clients** | Client information management (companies and contacts) | `Company`, `Address` |
