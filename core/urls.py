@@ -6,7 +6,7 @@ from .views import login_view, logout_view, sales_dashboard_view  # As views est
 
 urlpatterns = [
     # A rota principal ('') e 'sales_dashboard' apontam para o Dashboard
-    path('dashboard/sales/', views.sales_dashboard_view, name='sales_dashboard'),
+    path('', views.sales_dashboard_view, name='sales_dashboard'),
     path('', views.sales_dashboard_view, name='index'),
     # Rotas de Autenticação (Tratadas aqui)
     path('login/', views.login_view, name='login'),

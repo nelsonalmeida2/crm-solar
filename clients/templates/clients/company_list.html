@@ -1,0 +1,78 @@
+{% extends "core/base.html" %}
+
+{% block title %}Lista de Clientes{% endblock %}
+
+{% block content %}
+<style>
+    /* Estilos básicos para a tabela */
+    .client-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background-color: white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        border-radius: 6px;
+    }
+    .client-table th, .client-table td {
+        padding: 12px 15px;
+        border-bottom: 1px solid #ddd;
+        text-align: left;
+    }
+    .client-table th {
+        background-color: #f9f9f9;
+        font-weight: 600;
+        color: #333;
+    }
+    .client-table tr:hover {
+        background-color: #f1f1f1;
+    }
+    .status-solar {
+        font-weight: bold;
+        color: green;
+    }
+    .status-no-solar {
+        color: red;
+    }
+</style>
+
+<h1>Gestão de Clientes</h1>
+
+<div class="list-container">
+    {% if companies %}
+        <table class="client-table">
+            <thead>
+                <tr>
+                    <th>Nome da Empresa</th>
+                    <th>NIF</th>
+                    <th>Email</th>
+                    <th>Telefone</th>
+                    <th>Tem Solar?</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for company in companies %}
+                <tr>
+                    <td><a href="{% url 'clients:company_detail' pk=company.nif %}">{{ company.name }}</a></td>
+                    <td>{{ company.nif }}</td>
+                    <td>{{ company.email|default:"N/A" }}</td>
+                    <td>{{ company.phone_number|default:"-" }}</td>
+                    <td>
+                        {% if company.has_solar_panels %}
+                            <span class="status-solar">Sim</span>
+                        {% else %}
+                            <span class="status-no-solar">Não</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'clients:company_detail' pk=company.nif %}">Detalhes</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Não há clientes registados na base de dados.</p>
+    {% endif %}
+</div>
+{% endblock content %}

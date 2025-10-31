@@ -1,0 +1,52 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+
+    <h1 class="mb-4">Detalhe do Cliente: {{ company.name }}</h1>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Informação Base
+        </div>
+        <div class="card-body">
+            <p><strong>NIF:</strong> {{ company.pk }}</p>
+            <p><strong>Email:</strong> {{ company.email }}</p>
+            <p><strong>Telefone:</strong> {{ company.phone }}</p>
+            {# Adicionar o endereço (Foreign Key) #}
+            <p><strong>Morada:</strong> {{ company.address.street }}, {{ company.address.city }}</p>
+        </div>
+    </div>
+
+    <h2>Pontos de Energia (CPEs)</h2>
+    {% if cpes %}
+        <ul class="list-group mb-4">
+            {% for cpe in cpes %}
+                <li class="list-group-item">
+                    {{ cpe.code }} - {{ cpe.type }}
+                    {# Exemplo de link para o detalhe do CPE (se tiver a view criada) #}
+                    {# <a href="{% url 'energy:cpe_detail' pk=cpe.pk %}">Ver Detalhe</a> #}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Nenhum CPE registado para este cliente.</p>
+    {% endif %}
+
+    <h2>Oportunidades de Venda</h2>
+    {% if opportunities %}
+        <ul class="list-group">
+            {% for opp in opportunities %}
+                <li class="list-group-item">
+                    {{ opp.title }} - Status: <span class="badge bg-primary">{{ opp.opportunity_status.name }}</span>
+                    {# Exemplo de link para o detalhe da Oportunidade (se tiver a view criada) #}
+                    {# <a href="{% url 'sales:opportunity_detail' pk=opp.pk %}">Ver Detalhe</a> #}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Nenhuma oportunidade de venda ativa.</p>
+    {% endif %}
+
+</div>
+{% endblock content %}
