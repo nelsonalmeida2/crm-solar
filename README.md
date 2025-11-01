@@ -1,130 +1,94 @@
-# ☀️ CRMSolar: Solar Energy Sales Management System
+# 🌍 World Meter: Global Statistics Engine
 
-Welcome to the **CRMSolar** repository — a **Customer Relationship Management (CRM)** system built with **Django**, designed to optimize the **sales and installation process of solar energy projects**.
+Welcome to **World Meter** — a **Java** backend solution for processing and querying global statistical data. This project is designed as a **Command-Line Interface (CLI)** application to efficiently parse large datasets, clean them, and expose complex metrics in real-time.
 
-The project follows a modular architecture to ensure **separation of concerns**, **scalability**, and **maintainability**.
+The project focuses on efficient data manipulation, highlighting skills in **data structures** and **algorithm optimization**.
 
 ---
 
 ## 🛠️ Technologies Used
 
-- **Framework:** Django 
-- **Language:** Python  
-- **Database:** SQLite (Development) / PostgreSQL (Production)
-- **Auditing/Logging:** `django-simple-history` (Used exclusively for change logs and auditing)
+- **Language:** Java
 
 ---
 
 ## 🚀 Setup and Installation Guide
 
-Follow these steps to set up and run the project locally:
+Follow these steps to set up and run the project locally.
 
 ### 1️⃣ Clone the Repository
 
 ```bash
-git clone https://github.com/nelsonalmeida2/crm-solar.git
-cd crm-solar
+git clone https://github.com/nelsonalmeida2/deisi-world-meter.git
+cd deisi-world-meter
 ```
 
-### 2️⃣ Configure the Virtual Environment
+### 2️⃣ Setup (IDE - Recommended)
 
-Create and activate a virtual environment to isolate project dependencies.
+The easiest way to run the project is through an IDE (like IntelliJ IDEA, Eclipse, or VS Code).
+
+1.  Open the project in your IDE (open the `deisi-world-meter` folder).
+2.  The IDE should automatically detect the project structure.
+3.  Find the file `src/pt/ulusofona/aed/deisiworldmeter/Main.java`.
+4.  Right-click on the file and select **"Run 'Main.main()'"**.
+
+### 3️⃣ Compilation and Execution (Command-Line)
+
+If you prefer to run via the terminal:
+
+#### Compile the Project
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate      # macOS/Linux
-.venv\Scripts\activate         # Windows
+# (From the project root)
+# Create an 'out' directory for the .class files
+mkdir out
+
+# Compile all .java files
+javac -d out $(find src -name "*.java")
 ```
 
-### 3️⃣ Install Dependencies
-
-Install all required Python libraries using the `requirements.txt` file.
+#### Run the Application
 
 ```bash
-pip install -r requirements.txt
+# Run the Main class, including 'out' in the classpath
+java -cp out pt.ulusofona.aed.deisiworldmeter.Main
 ```
+---
 
-### 4️⃣ Project Initialization (Django Setup)
+## 🚀 Available Commands
 
-Initialize the base Django project structure and prepare the database.
+The application offers a powerful set of commands for analysis, querying, and data manipulation.
 
-#### Generate Migration Files
+### 📊 Statistical Analysis
+* `COUNT_CITIES <MinPopulation>`
+* `SUM_POPULATIONS <CountryName>`
+* `GET_MOST_POPULOUS <N>`
+* `GET_LEAST_POPULOUS <N>`
+* `GET_DUPLICATE_CITIES <MinPopulation>`
+* `GET_DUPLICATE_CITIES_DIFFERENT_COUNTRIES <MinPopulation>`
+* `GET_COUNTRIES_GENDER_GAP <MinGap>`
+* `GET_TOP_POPULATION_INCREASE <YearStart> <YearEnd>`
 
-```bash
-python manage.py makemigrations clients core energy sales
-```
+### 🌍 Geographical Queries
+* `GET_CITIES_BY_COUNTRY <N> <CountryName>`
+* `GET_TOP_CITIES_BY_COUNTRY <N> <CountryName>`
+* `GET_CITIES_AT_DISTANCE <Dist> <CityName>`
+* `GET_CITIES_AT_DISTANCE2 <Dist> <CityName>`
 
-#### Apply Migrations
+### 📈 Historical Data
+* `GET_HISTORY <YearStart> <YearEnd> <CountryName>`
+* `GET_MISSING_HISTORY <YearStart> <YearEnd>`
 
-```bash
-python manage.py migrate
-```
+### ✏️ Data Manipulation
+* `INSERT_CITY <Alfa2> <Name> <Region> <Population>`
+* `REMOVE_COUNTRY <CountryName>`
 
-#### Create Superuser
-
-```bash
-python manage.py createsuperuser
-```
+### ⚙️ Utilities
+* `HELP`: Displays the list of all available commands.
+* `QUIT`: Exits the application.
 
 ---
 
-### 5️⃣ Start the Server
-
-```bash
-python manage.py runserver
-```
-
-The system will be accessible at:  
-👉 [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
-
----
-
-## 🧱 Architecture and Modules
-
-The project is divided into independent Django applications, each with specific responsibilities:
-
-| Application | Responsibility | Key Entities |
-|--------------|----------------|-------------|
-| **core** | Central logic, authentication, dashboard, and abstract models (e.g., `TimeStampedUserModel`) | `login_view`, `sales_dashboard_view` |
-| **clients** | Client information management (companies and contacts) | `Company`, `Address` |
-| **energy** | Energy delivery point management | `CPE` (Energy Point Code) |
-| **sales** | Sales funnel management | `Opportunity`, `OpportunityStatus` |
-
----
-
-## 🔑 Main Routes
-
-| Route | Description | Authentication |
-|--------|--------------|----------------|
-| `/` | Main Sales Dashboard (filtered by assigned user) | ✅ |
-| `/login/` | User Authentication | ❌ |
-| `/logout/` | End user session | ✅ |
-| `/admin/` | Django Admin Panel | ✅ (Superuser) |
-
----
-
-## 🤝 Contributions
-
-Contributions are welcome!  
-Follow the standard Git workflow:
-
-1. Create a new branch  
-   ```bash
-   git checkout -b feature/new-feature-name
-   ```
-2. Make your changes  
-3. Commit your modifications  
-   ```bash
-   git commit -am 'Feat: short description of the change'
-   ```
-4. Push your branch to the remote repository  
-   ```bash
-   git push origin feature/new-feature-name
-   ```
-5. Open a Pull Request
-
----
-
-👨‍💻 **Developed by:** Nelson Almeida  
-📅 **Version:** 0.1.0  
-📦 **License:** MIT
+* 👨‍💻 **Developed by:** Nelson Almeida
+* 📅 **Version:** 1.0.0
+* 📦 **License:** MIT
